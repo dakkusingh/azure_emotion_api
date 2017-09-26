@@ -2,7 +2,7 @@
 
 namespace Drupal\azure_emotion_api\Service;
 
-use Drupal\azure_cognitive_services_api\Service\Client;
+use Drupal\azure_cognitive_services_api\Service\Client as AzureClient;
 use Drupal\Core\Config\ConfigFactory;
 
 /**
@@ -10,15 +10,24 @@ use Drupal\Core\Config\ConfigFactory;
  */
 class Emotion {
 
-  const API_URL = '/emotion/v1.0/';
+  /**
+   * @var \Drupal\azure_cognitive_services_api\Service\Client
+   */
+  private $azureClient;
+
+  /**
+   * @var \Drupal\Core\Config\ConfigFactory
+   */
+  private $configFactory;
 
   /**
    * Constructor for the Emotion API class.
    *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactory $configFactory
    */
-  public function __construct(ConfigFactory $config_factory) {
-    $this->client = new Client($config_factory, 'emotion');
+  public function __construct(ConfigFactory $configFactory, AzureClient $azureClient) {
+    $this->config = $configFactory->get('azure_emotion_api.settings');
+    $this->azureClient = $azureClient;
   }
 
   /**
@@ -29,8 +38,8 @@ class Emotion {
    * @return bool|mixed
    */
   public function recognize($photoUrl) {
-    $uri = self::API_URL . 'recognize';
-    $result = $this->client->doRequest($uri, 'POST', ['url' => $photoUrl]);
+    $uri = $this->config->get('api_url') . 'recognize';
+    $result = $this->azureClient->doRequest('emotion', $uri, 'POST', ['url' => $photoUrl]);
     return $result;
   }
 
