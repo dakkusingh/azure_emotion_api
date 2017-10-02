@@ -39,7 +39,9 @@ class Emotion {
    */
   public function recognize($photoUrl) {
     $uri = $this->config->get('api_url') . 'recognize';
-    $result = $this->azureClient->doRequest('emotion', $uri, 'POST', ['url' => $photoUrl]);
+    $body = ['json' => ['url' => $photoUrl]];
+
+    $result = $this->azureClient->doRequest('emotion', $uri, 'POST', $body);
     return $result;
   }
 
